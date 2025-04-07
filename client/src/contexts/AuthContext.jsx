@@ -38,49 +38,51 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, [token]);
 
-  const signup = async (email, password, preferredCity = null) => {
+  const signup = async (username, email, password, preferredCity) => {
     try {
-      const response = await fetch(`${API_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password, preferredCity }),
-      });
+        console.log('Making signup request with:', { username, email, preferredCity });
+        
+        const response = await fetch(`${API_URL}/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username,
+                email,
+                password,
+                preferredCity
+            })
+        });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
+        const data = await response.json();
+        console.log('Signup response:', response.status, data);
 
-      setCurrentUser(data.user);
-      setToken(data.token);
+        if (!response.ok) {
+            throw new Error(data.error || 'Registration failed');
+        }
 
-      toast({
-        title: "Success",
-        description: "Account created successfully",
-      });
-
-      return data.user;
+        return data;
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-      throw error;
+        console.error('Signup error in context:', error);
+        throw error;
     }
-  };
+};
 
-  const login = async (email, password) => {
+  const login = async (username, password) => {
     try {
+      console.log('Attempting login with username:', username);
       const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }), // Changed from email to username
       });
 
       const data = await response.json();
+      console.log('Login response:', response.status);
+
       if (!response.ok) throw new Error(data.error);
 
       setCurrentUser(data.user);
@@ -93,6 +95,7 @@ export const AuthProvider = ({ children }) => {
 
       return data.user;
     } catch (error) {
+      console.error('Login error:', error);
       toast({
         variant: "destructive",
         title: "Error",

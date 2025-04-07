@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,34 +6,60 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
-const SignupForm = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [preferredCity, setPreferredCity] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+export function SignupForm() {
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    preferredCity: ''
+  });
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { signup } = useAuth();
   const navigate = useNavigate();
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setError('');
 
-    if (password !== confirmPassword) {
+    // Add debug logging
+    console.log('Form data being sent:', {
+      username: formData.username,
+      email: formData.email,
+      password: formData.password,
+      preferredCity: formData.preferredCity
+    });
+
+    if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
+      setLoading(false);
       return;
     }
 
-    setIsLoading(true);
-
     try {
-      await signup(email, password, preferredCity || null);
-      navigate('/'); // Redirect to home page after signup
+      const response = await signup(
+        formData.username,
+        formData.email,
+        formData.password,
+        formData.preferredCity || null
+      );
+      console.log('Signup response:', response); // Add response logging
+      navigate('/');
     } catch (error) {
-      setError(error.message);
+      console.error('Signup error:', error);
+      setError(error.message || 'Registration failed');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -49,13 +74,25 @@ const SignupForm = () => {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
+            <Label htmlFor="username">Username</Label>
+            <Input
+              id="username"
+              name="username"
+              type="text"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
+              name="email"
               type="email"
               placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formData.email}
+              onChange={handleChange}
               required
             />
           </div>
@@ -63,32 +100,35 @@ const SignupForm = () => {
             <Label htmlFor="password">Password</Label>
             <Input
               id="password"
+              name="password"
               type="password"
               placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formData.password}
+              onChange={handleChange}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirm-password">Confirm Password</Label>
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
             <Input
-              id="confirm-password"
+              id="confirmPassword"
+              name="confirmPassword"
               type="password"
               placeholder="••••••••"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              value={formData.confirmPassword}
+              onChange={handleChange}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="preferred-city">Preferred City (Optional)</Label>
+            <Label htmlFor="preferredCity">Preferred City (Optional)</Label>
             <Input
-              id="preferred-city"
+              id="preferredCity"
+              name="preferredCity"
               type="text"
               placeholder="e.g. New York"
-              value={preferredCity}
-              onChange={(e) => setPreferredCity(e.target.value)}
+              value={formData.preferredCity}
+              onChange={handleChange}
             />
           </div>
           {error && (
@@ -97,9 +137,9 @@ const SignupForm = () => {
           <Button 
             type="submit" 
             className="w-full" 
-            disabled={isLoading}
+            disabled={loading}
           >
-            {isLoading ? 'Creating account...' : 'Sign Up'}
+            {loading ? 'Creating account...' : 'Sign Up'}
           </Button>
         </form>
       </CardContent>
@@ -117,6 +157,6 @@ const SignupForm = () => {
       </CardFooter>
     </Card>
   );
-};
+}
 
 export default SignupForm;

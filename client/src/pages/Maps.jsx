@@ -64,10 +64,10 @@ const Maps = () => {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <div className="flex-grow">
+            {/* <div className="flex-grow">
               <SearchBox onSearch={handleSearch} />
-            </div>
-            <div className="w-full md:w-64">
+            </div> */}
+            {/* <div className="w-full md:w-64">
               <Select value={mapType} onValueChange={handleMapTypeChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select map type" />
@@ -80,7 +80,7 @@ const Maps = () => {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
           </div>
           
           <div className="flex justify-center bg-black/20 rounded-lg p-4 mt-4">
