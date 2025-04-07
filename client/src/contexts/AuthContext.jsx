@@ -119,6 +119,44 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const requestPasswordReset = async (email, username) => {
+    try {
+      const response = await fetch(`${API_URL}/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, username }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const resetPassword = async (token, newPassword) => {
+    try {
+      const response = await fetch(`${API_URL}/auth/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token, newPassword }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const updateUserPreferences = async (preferences) => {
     try {
       const response = await fetch(`${API_URL}/user/preferences`, {
@@ -158,6 +196,8 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     updateUserPreferences,
+    requestPasswordReset,
+    resetPassword,
     loading
   };
 

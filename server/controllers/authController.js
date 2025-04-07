@@ -139,8 +139,8 @@ const authController = {
             });
 
             if (!user) {
-                return res.status(400).json({ 
-                    error: 'Password reset token is invalid or has expired' 
+                return res.status(400).json({
+                    error: 'Password reset token is invalid or has expired'
                 });
             }
 
@@ -150,7 +150,33 @@ const authController = {
             user.resetPasswordExpires = undefined;
 
             await user.save();
-            res.json({ message: 'Password reset successful' });
+            res.json({ message: 'Password has been reset successfully' });
+
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    },
+
+    resetPasswordDirect: async (req, res) => {
+        try {
+            const { username, email, newPassword } = req.body;
+
+            // Find user by username and email
+            const user = await User.findOne({ username, email });
+
+            if (!user) {
+                return res.status(404).json({ 
+                    error: 'User not found',
+                    redirect: 'signup'
+                });
+            }
+
+            // Hash the new password
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            user.password = hashedPassword;
+
+            await user.save();
+            res.json({ message: 'Password has been reset successfully' });
 
         } catch (error) {
             res.status(400).json({ error: error.message });

@@ -60,6 +60,15 @@ const LoginForm = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            <div className="text-right">
+              <Button 
+                variant="link" 
+                className="p-0 h-auto font-normal" 
+                onClick={() => navigate('/reset-password')}
+              >
+                Forgot password?
+              </Button>
+            </div>
           </div>
           {error && (
             <div className="text-destructive text-sm mt-2">{error}</div>
