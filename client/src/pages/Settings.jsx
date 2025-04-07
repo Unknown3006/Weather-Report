@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,8 +22,8 @@ const Settings = () => {
   }
   
   const [preferredCity, setPreferredCity] = useState(currentUser.preferredCity || '');
-  const [temperatureUnit, setTemperatureUnit] = useState('celsius');
-  const [notifications, setNotifications] = useState(false);
+  const [temperatureUnit, setTemperatureUnit] = useState(currentUser.settings?.temperatureUnit || 'celsius');
+  const [notifications, setNotifications] = useState(currentUser.settings?.notifications || false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -32,8 +31,13 @@ const Settings = () => {
     setIsLoading(true);
     
     try {
-      await updateUserPreferences(preferredCity);
-      // Temperature unit and notifications would be saved here in a real app
+      await updateUserPreferences({
+        preferredCity,
+        settings: {
+          temperatureUnit,
+          notifications
+        }
+      });
       
       toast({
         title: "Settings updated",
